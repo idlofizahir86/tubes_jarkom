@@ -1,5 +1,5 @@
 import socket
-import os
+import mimetypes
 
 # fungsi untuk menangani request yang masuk
 def handle_request(request):
@@ -11,7 +11,10 @@ def handle_request(request):
     try:
         with open('.' + filename, 'rb') as fin:
             content = fin.read()
-        response = 'HTTP/1.0 200 OK\n\n'.encode() + content
+        # gunakan modul mimetypes untuk menentukan jenis konten file
+        content_type, _ = mimetypes.guess_type(filename)
+        headers = f'HTTP/1.0 200 OK\nContent-Type: {content_type}\n\n'.encode()
+        response = headers + content
     except FileNotFoundError:
         response = 'HTTP/1.0 404 NOT FOUND\n\nFile Not Found'.encode()
 
@@ -26,7 +29,7 @@ server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 server_socket.bind((HOST, PORT))
 server_socket.listen(1)
-print(f'Listening on port {PORT} ...')
+print(f'Listening pada Host: {HOST} \nPort: {PORT} \n...')
 
 while True:
     # tunggu koneksi dari client
